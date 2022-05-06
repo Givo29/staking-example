@@ -503,7 +503,7 @@ export const claimFemaleNft = async (
   if (farmFemaleAcc === null) {
     return;
   } else {
-    const { txSig: txClaim } = await gf.claim(
+    const txClaim = await gf.claim(
       farmIdFemale,
       publicKey!,
       new PublicKey(farmFemaleAcc.rewardA.rewardMint!),
