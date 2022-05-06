@@ -509,7 +509,7 @@ export const claimFemaleNft = async (
       new PublicKey(farmFemaleAcc.rewardA.rewardMint!),
       new PublicKey(farmFemaleAcc.rewardB.rewardMint!)
     );
-    txs.instructions.push(new TransactionInstruction(txClaim));
+    txs.add(txClaim);
     // console.log(txClaim)
     await connection.confirmTransaction(txClaim)
   }
