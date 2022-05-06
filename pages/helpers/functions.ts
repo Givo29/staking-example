@@ -511,7 +511,7 @@ export const claimFemaleNft = async (
     );
     txs.add(txClaim);
     // console.log(txClaim)
-    await connection.confirmTransaction(txClaim)
+    // await connection.confirmTransaction(txClaim)
   }
 
   let blockhashObj = await connection.getRecentBlockhash();
