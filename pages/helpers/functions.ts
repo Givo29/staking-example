@@ -191,121 +191,114 @@ export const stakeNft = async (
   publicKey,
   sendTransaction
 ) => {
-  const gf = await initGemFarm(
-    connection,
-    wallet!.adapter as SignerWalletAdapter
-  );
+  try {
 
-  const gb = await initGemBank(
-    connection,
-    wallet!.adapter as SignerWalletAdapter
-  );
+    const gf = await initGemFarm(
+      connection,
+      wallet!.adapter as SignerWalletAdapter
+    );
 
-  const txs = new Transaction();
-  const farmer = await fetchFarmer(
-    connection,
-    wallet!.adapter as SignerWalletAdapter,
-    publicKey!
-  );
+    const gb = await initGemBank(
+      connection,
+      wallet!.adapter as SignerWalletAdapter
+    );
 
-  const farm = await fetchFarm(
-    connection,
-    wallet!.adapter as SignerWalletAdapter
-  );
-
-  let farmerVault: PublicKey;
-  if (farmer === null) {
-    // Initializes the farmer if it doesn't exist
-    const { txSig: txCreateFarmer, vault } = await gf!.initFarmer(
-      farmId,
-      publicKey!,
+    const txs = new Transaction();
+    const farmer = await fetchFarmer(
+      connection,
+      wallet!.adapter as SignerWalletAdapter,
       publicKey!
     );
-    // txs.add(txCreateFarmer);
-    await connection.confirmTransaction(txCreateFarmer)
-    farmerVault = vault;
-  } else {
-    farmerVault = farmer.farmerAcc.vault;
-  }
 
-  const [mintProof] = await findWhitelistProofPDA(farm.bank, mint);
+    const farm = await fetchFarm(
+      connection,
+      wallet!.adapter as SignerWalletAdapter
+    );
 
-  const [creatorProof] = await findWhitelistProofPDA(farm.bank, creator);
-
-  const metadata = await programs.metadata.Metadata.getPDA(mint);
-
-  if (publicKey) {
-    if (farmer !== null && farmer.farmerState === "staked") {
-      // const { tx: txDepositAndStake } = await gf!.flashDeposit(
-      //   farmId,
-      //   publicKey!,
-      //   new BN(1),
-      //   mint,
-      //   source,
-      //   mintProof,
-      //   metadata,
-      //   creatorProof
-      // );
-
-      // txs.add(txDepositAndStake);
-
-      // There's two calls to unstake, the first "unstakes" it
-      const { txSig: txUnstake } = await gf!.unstake(farmId, publicKey!);
-      // Then, the second ends the cooldown period
-      await connection.confirmTransaction(txUnstake)
-      const { txSig: txCooldown } = await gf!.unstake(farmId, publicKey!);
-      await connection.confirmTransaction(txCooldown)
-      // txs.add(txUnstake);
-      // txs.add(txCooldown);
-
-      const { txSig: txDeposit } = await gb.depositGem(
-        farm.bank,
-        farmerVault,
+    let farmerVault: PublicKey;
+    if (farmer === null) {
+      // Initializes the farmer if it doesn't exist
+      const { txSig: txCreateFarmer, vault } = await gf!.initFarmer(
+        farmId,
         publicKey!,
-        new BN(1),
-        mint,
-        source,
-        mintProof,
-        metadata,
-        creatorProof
+        publicKey!
       );
-      await connection.confirmTransaction(txDeposit)
-      // txs.add(txDeposit);
-
-
-      const { txSig: txStake } = await gf!.stake(farmId, publicKey!);
-      // txs.add(txStake);
-      await connection.confirmTransaction(txStake)
+      // txs.add(txCreateFarmer);
+      await connection.confirmTransaction(txCreateFarmer)
+      farmerVault = vault;
     } else {
-      const { txSig: txDeposit } = await gb.depositGem(
-        farm.bank,
-        farmerVault,
-        publicKey!,
-        new BN(1),
-        mint,
-        source,
-        mintProof,
-        metadata,
-        creatorProof
-      );
-      console.log(txDeposit)
-      // txs.add(txDeposit);
-      await connection.confirmTransaction(txDeposit)
-
-      const { txSig: txStake } = await gf!.stake(farmId, publicKey!);
-      // txs.add(txStake);
-      await connection.confirmTransaction(txStake)
+      farmerVault = farmer.farmerAcc.vault;
     }
-  }
 
-  try {
-    let blockhashObj = await connection.getRecentBlockhash();
-    txs.recentBlockhash = blockhashObj.blockhash;
-    txs.feePayer = publicKey!;
+    const [mintProof] = await findWhitelistProofPDA(farm.bank, mint);
 
-    const txid = await sendTransaction(txs, connection);
+    const [creatorProof] = await findWhitelistProofPDA(farm.bank, creator);
 
-    await connection.confirmTransaction(txid);
+    const metadata = await programs.metadata.Metadata.getPDA(mint);
+
+    if (publicKey) {
+      if (farmer !== null && farmer.farmerState === "staked") {
+        // const { tx: txDepositAndStake } = await gf!.flashDeposit(
+        //   farmId,
+        //   publicKey!,
+        //   new BN(1),
+        //   mint,
+        //   source,
+        //   mintProof,
+        //   metadata,
+        //   creatorProof
+        // );
+
+        // txs.add(txDepositAndStake);
+
+        // There's two calls to unstake, the first "unstakes" it
+        const { txSig: txUnstake } = await gf!.unstake(farmId, publicKey!);
+        // Then, the second ends the cooldown period
+        await connection.confirmTransaction(txUnstake)
+        const { txSig: txCooldown } = await gf!.unstake(farmId, publicKey!);
+        await connection.confirmTransaction(txCooldown)
+        // txs.add(txUnstake);
+        // txs.add(txCooldown);
+
+        const { txSig: txDeposit } = await gb.depositGem(
+          farm.bank,
+          farmerVault,
+          publicKey!,
+          new BN(1),
+          mint,
+          source,
+          mintProof,
+          metadata,
+          creatorProof
+        );
+        await connection.confirmTransaction(txDeposit)
+        // txs.add(txDeposit);
+
+
+        const { txSig: txStake } = await gf!.stake(farmId, publicKey!);
+        // txs.add(txStake);
+        await connection.confirmTransaction(txStake)
+      } else {
+        const { txSig: txDeposit } = await gb.depositGem(
+          farm.bank,
+          farmerVault,
+          publicKey!,
+          new BN(1),
+          mint,
+          source,
+          mintProof,
+          metadata,
+          creatorProof
+        );
+        console.log(txDeposit)
+        // txs.add(txDeposit);
+        await connection.confirmTransaction(txDeposit)
+
+        const { txSig: txStake } = await gf!.stake(farmId, publicKey!);
+        // txs.add(txStake);
+        await connection.confirmTransaction(txStake)
+      }
+    }
   } catch (e) {
     console.log(e);
   }
@@ -319,55 +312,58 @@ export const unstakeFemaleNft = async (
   sendTransaction: any,
   currentStakedNFTs
 ) => {
-  const gf = await initGemFarm(
-    connection,
-    wallet!.adapter as SignerWalletAdapter
-  );
-  const gb = await initGemBank(
-    connection,
-    wallet!.adapter as SignerWalletAdapter
-  );
-
-  const farmAcc = await fetchFemaleFarm(
-    connection,
-    wallet!.adapter as SignerWalletAdapter
-  );
-  const { farmerAcc } = await fetchFemaleFarmer(
-    connection,
-    wallet!.adapter as SignerWalletAdapter,
-    publicKey
-  );
-
-  // There's two calls to unstake, the first "unstakes" it
-  const { txSig: txUnstake } = await gf!.unstake(farmIdFemale, publicKey!);
-  // Then, the second ends the cooldown period
-  const { txSig: txCooldown } = await gf!.unstake(farmIdFemale, publicKey!);
-  // Then and only then we can withdraw the gem
-  const { txSig: txWithdraw } = await gb!.withdrawGem(
-    farmAcc.bank,
-    farmerAcc.vault,
-    publicKey!,
-    new BN(1),
-    mint,
-    publicKey!
-  );
-
-  const txs = new Transaction().add(txUnstake).add(txCooldown).add(txWithdraw);
-
-  // Then, if there was more than this NFT staking, we need to restart
-  // staking for the other ones
-  if (currentStakedNFTs !== null && currentStakedNFTs.length > 1) {
-    const { txSig } = await gf!.stake(farmIdFemale, publicKey!);
-    txs.add(txSig);
-  }
-
-  let blockhashObj = await connection.getRecentBlockhash();
-  txs.recentBlockhash = blockhashObj.blockhash;
-  txs.feePayer = publicKey!;
-
   try {
-    const txid = await sendTransaction(txs, connection);
-    await connection.confirmTransaction(txid);
+    const gf = await initGemFarm(
+      connection,
+      wallet!.adapter as SignerWalletAdapter
+    );
+    const gb = await initGemBank(
+      connection,
+      wallet!.adapter as SignerWalletAdapter
+    );
+
+    const farmAcc = await fetchFemaleFarm(
+      connection,
+      wallet!.adapter as SignerWalletAdapter
+    );
+    const { farmerAcc } = await fetchFemaleFarmer(
+      connection,
+      wallet!.adapter as SignerWalletAdapter,
+      publicKey
+    );
+
+    // There's two calls to unstake, the first "unstakes" it
+    const { txSig: txUnstake } = await gf!.unstake(farmIdFemale, publicKey!);
+    // Then, the second ends the cooldown period
+    await connection.confirmTransaction(txUnstake);
+    const { txSig: txCooldown } = await gf!.unstake(farmIdFemale, publicKey!);
+    // Then and only then we can withdraw the gem
+    await connection.confirmTransaction(txCooldown);
+    const { txSig: txWithdraw } = await gb!.withdrawGem(
+      farmAcc.bank,
+      farmerAcc.vault,
+      publicKey!,
+      new BN(1),
+      mint,
+      publicKey!
+    );
+    await connection.confirmTransaction(txWithdraw);
+    // const txs = new Transaction().add(txUnstake).add(txCooldown).add(txWithdraw);
+
+    // Then, if there was more than this NFT staking, we need to restart
+    // staking for the other ones
+    if (currentStakedNFTs !== null && currentStakedNFTs.length > 1) {
+      const { txSig } = await gf!.stake(farmIdFemale, publicKey!);
+      // txs.add(txSig);
+    }
+
+    // let blockhashObj = await connection.getRecentBlockhash();
+    // txs.recentBlockhash = blockhashObj.blockhash;
+    // txs.feePayer = publicKey!;
+
+
+    // const txid = await sendTransaction(txs, connection);
+    // await connection.confirmTransaction(txid);
   } catch (e) {
     console.log(e);
   }
@@ -386,55 +382,60 @@ export const unstakeNft = async (
   sendTransaction: any,
   currentStakedNFTs
 ) => {
-  const gf = await initGemFarm(
-    connection,
-    wallet!.adapter as SignerWalletAdapter
-  );
-  const gb = await initGemBank(
-    connection,
-    wallet!.adapter as SignerWalletAdapter
-  );
-
-  const farmAcc = await fetchFarm(
-    connection,
-    wallet!.adapter as SignerWalletAdapter
-  );
-  const { farmerAcc } = await fetchFarmer(
-    connection,
-    wallet!.adapter as SignerWalletAdapter,
-    publicKey
-  );
-
-  // There's two calls to unstake, the first "unstakes" it
-  const { txSig: txUnstake } = await gf!.unstake(farmId, publicKey!);
-  // Then, the second ends the cooldown period
-  const { txSig: txCooldown } = await gf!.unstake(farmId, publicKey!);
-  // Then and only then we can withdraw the gem
-  const { txSig: txWithdraw } = await gb!.withdrawGem(
-    farmAcc.bank,
-    farmerAcc.vault,
-    publicKey!,
-    new BN(1),
-    mint,
-    publicKey!
-  );
-
-  const txs = new Transaction().add(txUnstake).add(txCooldown).add(txWithdraw);
-
-  // Then, if there was more than this NFT staking, we need to restart
-  // staking for the other ones
-  if (currentStakedNFTs !== null && currentStakedNFTs.length > 1) {
-    const { txSig } = await gf!.stake(farmId, publicKey!);
-    txs.add(txSig);
-  }
-
-  let blockhashObj = await connection.getRecentBlockhash();
-  txs.recentBlockhash = blockhashObj.blockhash;
-  txs.feePayer = publicKey!;
-
   try {
-    const txid = await sendTransaction(txs, connection);
-    await connection.confirmTransaction(txid);
+    const gf = await initGemFarm(
+      connection,
+      wallet!.adapter as SignerWalletAdapter
+    );
+    const gb = await initGemBank(
+      connection,
+      wallet!.adapter as SignerWalletAdapter
+    );
+
+    const farmAcc = await fetchFarm(
+      connection,
+      wallet!.adapter as SignerWalletAdapter
+    );
+    const { farmerAcc } = await fetchFarmer(
+      connection,
+      wallet!.adapter as SignerWalletAdapter,
+      publicKey
+    );
+
+    // There's two calls to unstake, the first "unstakes" it
+    const { txSig: txUnstake } = await gf!.unstake(farmId, publicKey!);
+    // Then, the second ends the cooldown period
+    await connection.confirmTransaction(txUnstake);
+    const { txSig: txCooldown } = await gf!.unstake(farmId, publicKey!);
+    // Then and only then we can withdraw the gem
+    await connection.confirmTransaction(txCooldown);
+    const { txSig: txWithdraw } = await gb!.withdrawGem(
+      farmAcc.bank,
+      farmerAcc.vault,
+      publicKey!,
+      new BN(1),
+      mint,
+      publicKey!
+    );
+    await connection.confirmTransaction(txWithdraw);
+
+    // const txs = new Transaction().add(txUnstake).add(txCooldown).add(txWithdraw);
+
+    // Then, if there was more than this NFT staking, we need to restart
+    // staking for the other ones
+    if (currentStakedNFTs !== null && currentStakedNFTs.length > 1) {
+      const { txSig } = await gf!.stake(farmId, publicKey!);
+      // txs.add(txSig);
+      await connection.confirmTransaction(txSig);
+    }
+
+  // let blockhashObj = await connection.getRecentBlockhash();
+  // txs.recentBlockhash = blockhashObj.blockhash;
+  // txs.feePayer = publicKey!;
+
+
+    // const txid = await sendTransaction(txs, connection);
+    // await connection.confirmTransaction(txid);
   } catch (e) {
     console.log(e);
   }
@@ -446,38 +447,39 @@ export const claimNft = async (
   publicKey: PublicKey,
   sendTransaction: any
 ) => {
-  const gf = await initGemFarm(
-    connection,
-    wallet!.adapter as SignerWalletAdapter
-  );
-
-  const txs = new Transaction();
-
-  const farmAcc = await fetchFarm(
-    connection,
-    wallet!.adapter as SignerWalletAdapter
-  );
-  if (farmAcc === null) {
-    return;
-  } else {
-    const txClaim = await gf.claim(
-      farmId,
-      publicKey!,
-      new PublicKey(farmAcc.rewardA.rewardMint!),
-      new PublicKey(farmAcc.rewardB.rewardMint!)
-    );
-    console.log(txClaim)
-    // await connection.confirmTransaction(txClaim)
-    txs.add(txClaim);
-  }
-
-  let blockhashObj = await connection.getRecentBlockhash();
-  txs.recentBlockhash = blockhashObj.blockhash;
-  txs.feePayer = publicKey!;
-
   try {
-    const txid = await sendTransaction(txs, connection);
-    await connection.confirmTransaction(txid);
+    const gf = await initGemFarm(
+      connection,
+      wallet!.adapter as SignerWalletAdapter
+    );
+
+    const txs = new Transaction();
+
+    const farmAcc = await fetchFarm(
+      connection,
+      wallet!.adapter as SignerWalletAdapter
+    );
+    if (farmAcc === null) {
+      return;
+    } else {
+      const txClaim = await gf.claim(
+        farmId,
+        publicKey!,
+        new PublicKey(farmAcc.rewardA.rewardMint!),
+        new PublicKey(farmAcc.rewardB.rewardMint!)
+      );
+      console.log(txClaim)
+      // await connection.confirmTransaction(txClaim)
+      // txs.add(txClaim);
+    }
+
+    // let blockhashObj = await connection.getRecentBlockhash();
+    // txs.recentBlockhash = blockhashObj.blockhash;
+    // txs.feePayer = publicKey!;
+
+
+    //   const txid = await sendTransaction(txs, connection);
+      await connection.confirmTransaction(txid);
   } catch (e) {
     console.error(e);
   }
@@ -509,9 +511,9 @@ export const claimFemaleNft = async (
       new PublicKey(farmFemaleAcc.rewardA.rewardMint!),
       new PublicKey(farmFemaleAcc.rewardB.rewardMint!)
     );
-    txs.add(txClaim);
+    // txs.add(txClaim);
     // console.log(txClaim)
-    // await connection.confirmTransaction(txClaim)
+    await connection.confirmTransaction(txClaim)
   }
 
   let blockhashObj = await connection.getRecentBlockhash();
