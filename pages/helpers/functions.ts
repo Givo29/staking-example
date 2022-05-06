@@ -469,7 +469,7 @@ export const claimNft = async (
         new PublicKey(farmAcc.rewardB.rewardMint!)
       );
       console.log(txClaim)
-      // await connection.confirmTransaction(txClaim)
+      await connection.confirmTransaction(txClaim)
       // txs.add(txClaim);
     }
 
@@ -479,7 +479,7 @@ export const claimNft = async (
 
 
     //   const txid = await sendTransaction(txs, connection);
-      await connection.confirmTransaction(txid);
+      // await connection.confirmTransaction(txid);
   } catch (e) {
     console.error(e);
   }
