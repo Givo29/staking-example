@@ -1,0 +1,130 @@
+@font-face {
+    font-family: "Furore";
+    src: url("./public/fonts/Furore.woff") format("woff");
+}
+
+body,
+html {
+    background: url("./images/background.png") #020b1c no-repeat bottom center;
+    background-size: cover;
+    color: #fff;
+    font-family: "Work Sans", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+.background-container {
+    min-height: calc(100vh - 90px - 270px);
+}
+
+.footer-background {
+    height: auto;
+    width: 100% !important;
+}
+
+body,
+button,
+html,
+input {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+p {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 16px;
+    font-weight: 400;
+    @media only screen and (min-width: 768px) {
+        font-size: 18px;
+    }
+    @media only screen and (min-width: 1400px) {
+        font-size: 20px;
+    }
+}
+
+*:focus {
+    outline: none;
+}
+
+h2,
+h3,
+h4,
+h5 {
+    font-family: "Furore", sans-serif;
+    font-weight: 700;
+    margin: 0;
+    margin-bottom: 40px;
+}
+
+/**
+* until https://github.com/facebook/create-react-app/issues/11771
+* gets fixed, let's hide the problem and not address it
+*/
+
+body>iframe[style*="2147483647"]:not([id="webpack-dev-server-client-overlay"]) {
+    display: none;
+}
+
+/* h1 {
+  font-size: 24px;
+
+  @media only screen and (min-width: 768px) {
+    font-size: 48px;
+  }
+} */
+
+h2 {
+    font-size: 28px;
+    @media only screen and (min-width: 768px) {
+        font-size: 36px;
+    }
+}
+
+span {
+    display: inline;
+}
+
+strong {
+    font-weight: 800;
+}
+
+button {
+    align-items: center;
+    border-radius: 4px;
+    color: #000;
+    cursor: pointer;
+    display: flex;
+    font-family: "Furore", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    height: 43px;
+    padding: 0 60px;
+    text-transform: uppercase;
+    @media only screen and (max-width: 768px) {
+        font-size: 10px;
+    }
+}
+
+.connect-button {
+    background: url("./images/button-background.png") transparent !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    font-family: "Furore", sans-serif;
+}
+
+.chakra-ui-light {
+    background: transparent;
+}
+
+.wallet-adapter-modal-title {
+    color: #fff;
+}
+
+.intro-progress {
+    background: url("./images/progress-background.png") #fdfb00;
+    position: relative;
+    z-index: 5;
+}
