@@ -18,7 +18,10 @@ import {
 } from "../helpers/functions";
 import { SignerWalletAdapter } from "@solana/wallet-adapter-base";
 import styled from "styled-components";
+import Loader from "react-loader-spinner";
+// import 'react-loading-spinkit/dist/react-datepicker.css'
 // import Loading from "react-loading-spinkit";
+// import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 // import VaultItem from "components/VaultItem";
 import HodlIntro from "../components/HodlIntro";
 import VaultItemAdvanced from "../components/VaultItemAdvanced";
@@ -288,9 +291,10 @@ const Home = ({ loading, setLoading }) => {
               right: 0,
               top: 0,
               zIndex: 10,
+              textAlign: 'center'
             }}
           >
-            
+         <img src={'spinner.gif'} style={{marginTop: "25%", height: "150px"}}/>
           </div>
         )}
         <PageWrapper>

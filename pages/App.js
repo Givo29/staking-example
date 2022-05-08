@@ -31,8 +31,8 @@ import Home from "./containers/home";
 import styled from "styled-components";
 import Container from 'react-bootstrap/Container'
 
-import Logo from './images/logo.png'
-import Background from "./images/footer-background.png"
+var Logo = 'logo.png'
+var Background = "footer-background.png"
 import Discord from './images/discord.png'
 import Twitter from './images/twitter.png'
 import Instagram from './images/ig.png'

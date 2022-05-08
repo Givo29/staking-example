@@ -229,37 +229,15 @@ export const stakeNft = async (
     } else {
       farmerVault = farmer.farmerAcc.vault;
     }
-
     const [mintProof] = await findWhitelistProofPDA(farm.bank, mint);
-
     const [creatorProof] = await findWhitelistProofPDA(farm.bank, creator);
-
     const metadata = await programs.metadata.Metadata.getPDA(mint);
-
     if (publicKey) {
       if (farmer !== null && farmer.farmerState === "staked") {
-        // const { tx: txDepositAndStake } = await gf!.flashDeposit(
-        //   farmId,
-        //   publicKey!,
-        //   new BN(1),
-        //   mint,
-        //   source,
-        //   mintProof,
-        //   metadata,
-        //   creatorProof
-        // );
-
-        // txs.add(txDepositAndStake);
-
-        // There's two calls to unstake, the first "unstakes" it
         const { txSig: txUnstake } = await gf!.unstake(farmId, publicKey!);
-        // Then, the second ends the cooldown period
         await connection.confirmTransaction(txUnstake)
         const { txSig: txCooldown } = await gf!.unstake(farmId, publicKey!);
         await connection.confirmTransaction(txCooldown)
-        // txs.add(txUnstake);
-        // txs.add(txCooldown);
-
         const { txSig: txDeposit } = await gb.depositGem(
           farm.bank,
           farmerVault,
@@ -272,11 +250,7 @@ export const stakeNft = async (
           creatorProof
         );
         await connection.confirmTransaction(txDeposit)
-        // txs.add(txDeposit);
-
-
         const { txSig: txStake } = await gf!.stake(farmId, publicKey!);
-        // txs.add(txStake);
         await connection.confirmTransaction(txStake)
       } else {
         const { txSig: txDeposit } = await gb.depositGem(
@@ -331,8 +305,6 @@ export const unstakeFemaleNft = async (
       wallet!.adapter as SignerWalletAdapter,
       publicKey
     );
-
-    // There's two calls to unstake, the first "unstakes" it
     const { txSig: txUnstake } = await gf!.unstake(farmIdFemale, publicKey!);
     // Then, the second ends the cooldown period
     await connection.confirmTransaction(txUnstake);
@@ -462,7 +434,7 @@ export const claimNft = async (
     if (farmAcc === null) {
       return;
     } else {
-      const txClaim = await gf.claim(
+      const {txSig: txClaim} = await gf.claim(
         farmId,
         publicKey!,
         new PublicKey(farmAcc.rewardA.rewardMint!),
@@ -491,37 +463,31 @@ export const claimFemaleNft = async (
   publicKey: PublicKey,
   sendTransaction: any
 ) => {
-  const gf = await initGemFarm(
-    connection,
-    wallet!.adapter as SignerWalletAdapter
-  );
-
-  const txs = new Transaction();
-
-  const farmFemaleAcc = await fetchFemaleFarm(
-    connection,
-    wallet!.adapter as SignerWalletAdapter
-  );
-  if (farmFemaleAcc === null) {
-    return;
-  } else {
-    const txClaim = await gf.claim(
-      farmIdFemale,
-      publicKey!,
-      new PublicKey(farmFemaleAcc.rewardA.rewardMint!),
-      new PublicKey(farmFemaleAcc.rewardB.rewardMint!)
-    );
-    // txs.add(txClaim);
-    // console.log(txClaim)
-    await connection.confirmTransaction(txClaim)
-  }
-
-  let blockhashObj = await connection.getRecentBlockhash();
-  txs.recentBlockhash = blockhashObj.blockhash;
-  txs.feePayer = publicKey!;
-
   try {
-    const txid = await sendTransaction(txs, connection);
+    const gf = await initGemFarm(
+      connection,
+      wallet!.adapter as SignerWalletAdapter
+    );
+
+    const txs = new Transaction();
+
+    const farmFemaleAcc = await fetchFemaleFarm(
+      connection,
+      wallet!.adapter as SignerWalletAdapter
+    );
+    if (farmFemaleAcc === null) {
+      return;
+    } else {
+      const {txSig: txClaim} = await gf.claim(
+        farmIdFemale,
+        publicKey!,
+        new PublicKey(farmFemaleAcc.rewardA.rewardMint!),
+        new PublicKey(farmFemaleAcc.rewardB.rewardMint!)
+      );
+      // txs.add(txClaim);
+      console.log(txClaim)
+      await connection.confirmTransaction(txClaim)
+    }
     // await connection.confirmTransaction(txid);
   } catch (e) {
     console.error(e);
