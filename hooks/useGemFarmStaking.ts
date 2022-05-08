@@ -5,11 +5,11 @@ import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react"
 import { BN } from "@project-serum/anchor"
 import { PublicKey } from "@solana/web3.js"
 
-import useWalletNFTs, { NFT } from "hooks/useWalletNFTs"
-import { initGemBank } from "lib/gem-farm/common/gem-bank"
-import { GemFarm, initGemFarm } from "lib/gem-farm/common/gem-farm"
-import { getNFTMetadataForMany } from "utils/nfts"
-import { GemBank } from "lib/gem-farm/common/gem-bank"
+import useWalletNFTs, { NFT } from "./useWalletNFTs"
+import { initGemBank } from "../lib/gem-farm/common/gem-bank"
+import { GemFarm, initGemFarm } from "../lib/gem-farm/common/gem-farm"
+import { getNFTMetadataForMany } from "../utils/nfts"
+import { GemBank } from "../lib/gem-farm/common/gem-bank"
 
 const useGemFarmStaking = (farmId: string) => {
   const { connection } = useConnection()
@@ -233,7 +233,7 @@ const useGemFarmStaking = (farmId: string) => {
       await depositGem(
         new PublicKey(nft.onchainMetadata.mint),
         creator,
-        nft.pubkey
+        nft.pubkey!
       )
     }
 
