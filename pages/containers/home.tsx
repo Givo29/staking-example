@@ -153,7 +153,10 @@ const Home = ({ loading, setLoading }) => {
       publicKey
     );
 
-    if (nft.data.creators[0].address === process.env.NEXT_PUBLIC_REACT_APP_CREATOR_ID) {
+    if (
+      nft.data.creators[0].address ===
+      process.env.NEXT_PUBLIC_REACT_APP_CREATOR_ID
+    ) {
       await stakeNft(
         connection,
         wallet,
@@ -291,10 +294,13 @@ const Home = ({ loading, setLoading }) => {
               right: 0,
               top: 0,
               zIndex: 10,
-              textAlign: 'center'
+              textAlign: "center",
             }}
           >
-         <img src={'spinner.gif'} style={{marginTop: "25%", height: "150px"}}/>
+            <img
+              src={"spinner.gif"}
+              style={{ marginTop: "25%", height: "150px" }}
+            />
           </div>
         )}
         <PageWrapper>
