@@ -15,7 +15,7 @@ import {
   stakeNft,
   unstakeFemaleNft,
   unstakeNft,
-} from "../helpers/functions";
+} from "../../lib/helpers/functions";
 import { SignerWalletAdapter } from "@solana/wallet-adapter-base";
 import styled from "styled-components";
 import Loader from "react-loader-spinner";
