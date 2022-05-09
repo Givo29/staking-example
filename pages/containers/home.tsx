@@ -267,14 +267,15 @@ const Home = ({ loading, setLoading }) => {
               percFemale={Number(percFemale)}
             />
             <WalletMultiButton
-              children={"Connect"}
               style={{
                 color: "#000",
                 padding: "0 58px",
                 height: 64,
               }}
               className="connect-button"
-            />
+            >
+              Connect
+            </WalletMultiButton>
           </IntroContainer>
         </PageContainer>
       </PageWrapper>
