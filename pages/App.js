@@ -28,7 +28,7 @@ import Twitter from "./images/twitter.png";
 import Instagram from "./images/ig.png";
 
 import Coming from "./images/soon.png";
-// import DropdownBG from './images/dropdown-bg.png'
+// import DropdownBG from './images/dropdown-bg.png' 
 
 const App = () => {
   const [loading, setLoading] = useState(false);
