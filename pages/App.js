@@ -244,9 +244,9 @@ const App = () => {
         reverseOrder = {
             false
         }
-        /> <
-        /WalletProvider> <
-        /ConnectionProvider>
+        /> 
+        </WalletProvider> 
+        </ConnectionProvider>
     );
 };
 
