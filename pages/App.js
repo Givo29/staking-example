@@ -77,8 +77,8 @@ const App = () => {
         }, []
     );
     console.log('hj')
-    return ( <
-        ConnectionProvider endpoint ={endpoint} >
+    return ( 
+        <ConnectionProvider endpoint ={endpoint} >
         <
         WalletProvider wallets = {
             wallets
