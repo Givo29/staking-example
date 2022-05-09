@@ -23,7 +23,7 @@ import { clusterApiUrl } from "@solana/web3.js"
 // Default styles that can be overridden by your app
 require("@solana/wallet-adapter-react-ui/styles.css")
 
-const Wallet: FC = ({ children }: { children: React.ReactChild }) => {
+const Wallet = ({ children }: { children: React.ReactNode }) => {
   // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
   const network = process.env
     .NEXT_PUBLIC_CONNECTION_NETWORK as WalletAdapterNetwork
@@ -62,7 +62,6 @@ const Wallet: FC = ({ children }: { children: React.ReactChild }) => {
           <WalletDisconnectButton /> */}
 
           {children}
-          {/* Your app's components go here, nested within the context providers. */}
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
